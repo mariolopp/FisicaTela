@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using static UnityEditor.PlayerSettings;
+using UnityEditor.Experimental.GraphView;
 
 /// <summary>
 /// Basic physics manager capable of simulating a given ISimulable
@@ -52,6 +53,25 @@ public class MassSpringCloth : MonoBehaviour
 
     public void Start()
     {
+        // Malla asociada al game Object
+        Mesh mesh = this.GetComponent<MeshFilter>().mesh;
+
+        // Vertices y triangulos de la malla
+        Vector3[] vertices = mesh.vertices;     // Guarda la coordenada local del vertice
+        int[] triangles = mesh.triangles;       // Guarda los indices de los vertices de un triangulo bajo un identificador de triangulo
+
+        // Transformar la posición del primer vértice a coordenadas globales
+        int i = 0;                      // Índice del primer vértice
+        pos = transform.TransformPoint(vertices[i]);
+
+        foreach (Vector3 vertex in vertices)
+        {
+            // Crear un nuevo nodo con la posición del vértice
+            Node nodo = new Node(vertex);       // Creo que tengo que implementar un constructor
+
+            // Agregar el nodo a la lista de nodos
+            nodes.Add(nodo);
+        }
 
     }
 
