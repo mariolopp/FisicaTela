@@ -4,11 +4,6 @@ using System.Collections.Generic;
 using static UnityEditor.PlayerSettings;
 using UnityEditor.Experimental.GraphView;
 
-/// <summary>
-/// Basic physics manager capable of simulating a given ISimulable
-/// implementation using diverse integration methods: explicit,
-/// implicit, Verlet and semi-implicit.
-/// </summary>
 public class MassSpringCloth : MonoBehaviour 
 {
 	/// <summary>
@@ -36,29 +31,31 @@ public class MassSpringCloth : MonoBehaviour
 	public bool Paused;
 	public float TimeStep;
     public Vector3 Gravity;
-    public Vector3 pos;
 	public Integration IntegrationMethod;
-    public Node nodeHigh;
-    public Node nodeLow;
-    public Spring spring;
     public List<Node> nodes;        // Lista de nodos
     public List<Spring> springList; // Lista de muelles
 
     #endregion
 
     #region OtherVariables
+    Vector3 pos;
     #endregion
 
     #region MonoBehaviour
-
+    public void Awake()
+    {
+        this.nodes = new List<Node>();
+    }
     public void Start()
     {
+        Paused = false;
         // Malla asociada al game Object
         Mesh mesh = this.GetComponent<MeshFilter>().mesh;
 
         // Vertices y triangulos de la malla
         Vector3[] vertices = mesh.vertices;     // Guarda la coordenada local del vertice
         int[] triangles = mesh.triangles;       // Guarda los indices de los vertices de un triangulo bajo un identificador de triangulo
+       
 
         // Transformar la posición del primer vértice a coordenadas globales
         int i = 0;                      // Índice del primer vértice
@@ -69,15 +66,25 @@ public class MassSpringCloth : MonoBehaviour
             // Crear un nuevo nodo con la posición del vértice
             Node nodo = new Node(vertex);       // Creo que tengo que implementar un constructor
 
+
             // Agregar el nodo a la lista de nodos
             nodes.Add(nodo);
+            print("creado nodo en la pos "+nodo.pos);
         }
 
     }
 
     public void Update()
 	{
-		
+        Mesh mesh = this.GetComponent<MeshFilter>().mesh;
+        Vector3[] vertices = new Vector3[mesh.vertexCount];
+
+        int i = 0;
+        // Convertir el vertice a coordenadas locales
+        vertices[i] = transform.InverseTransformPoint(pos);
+
+        // Refrescar la geometria igualando al array
+        mesh.vertices = vertices;
     }
 
     public void FixedUpdate()
@@ -110,62 +117,31 @@ public class MassSpringCloth : MonoBehaviour
 	/// </summary>
 	private void stepSymplectic()       // Metodo de integracion
 	{
-        
-        //    // Calcular la fuerza sobre los nodos
-        //    nodeLow.force = Vector3.zero;       // Resetea la fuerza de la particula
-        //    nodeLow.ComputeForces();            // Calcula su propia nueva fuerza
-        //    spring.ComputeForces();     // Cada uno de los objetos que conoce unas ciertas cualidades es capaz de calcular las fuerzas
-
-        //if (!nodeLow._fixed)
+        //foreach (Node n in nodes) {     // Recorremos los nodos existentes en la lista
+        //    if (!n._fixed)
+        //    {
+        //        // Calcular la fuerza sobre los nodos
+        //        n.force = Vector3.zero;       // Resetea la fuerza de la particula
+        //        n.ComputeForces();            // Calcula su propia nueva fuerza
+        //    }
+        //}
+        //foreach (Spring spring in springList)
         //{
-        //    // Calcular la aceleracion
-        //    nodeLow.vel += TimeStep / nodeLow.mass * nodeLow.force;     // Calcular velocidades
-        //    nodeLow.pos += TimeStep * nodeLow.vel;                      // Calcular posicion
-
+        //    spring.ComputeForces();     // Cada uno de los objetos que conoce unas ciertas cualidades es capaz de calcular las fuerzas
+        //}
+        //foreach (Node n in nodes)
+        //{
+        //    if (!n._fixed)
+        //    {
+        //        // Calcular la aceleracion
+        //        n.vel += TimeStep / n.mass * n.force;     // Calcular velocidades
+        //        n.pos += TimeStep * n.vel;                      // Calcular posicion
+        //    }
+        //}
+        //foreach (Spring spring in springList)
+        //{
         //    spring.UpdateLength();
         //}
-        
-        //    // Calcular la fuerza sobre los nodos
-        //    nodeHigh.force = Vector3.zero;       // Resetea la fuerza de la particula
-        //    nodeHigh.ComputeForces();            // Calcula su propia nueva fuerza
-        //    spring.ComputeForces();     // Cada uno de los objetos que conoce unas ciertas cualidades es capaz de calcular las fuerzas
-
-        //if (!nodeHigh._fixed)
-        //{
-        //    // Calcular la aceleracion
-        //    nodeHigh.vel += TimeStep / nodeHigh.mass * nodeHigh.force;     // Calcular velocidades
-        //    nodeHigh.pos += TimeStep * nodeHigh.vel;                      // Calcular posicion
-
-        //    spring.UpdateLength();
-        //}
-
-        // Vamos a hacer esto mas escalable, para ello vamos a utilizar una lista de nodos mediante el uso de un array
-
-        foreach (Node n in nodes) {     // Recorremos los nodos existentes en la lista
-            if (!n._fixed)
-            {
-                // Calcular la fuerza sobre los nodos
-                n.force = Vector3.zero;       // Resetea la fuerza de la particula
-                n.ComputeForces();            // Calcula su propia nueva fuerza
-            }
-        }
-        foreach (Spring spring in springList)
-        {
-            spring.ComputeForces();     // Cada uno de los objetos que conoce unas ciertas cualidades es capaz de calcular las fuerzas
-        }
-        foreach (Node n in nodes)
-        {
-            if (!n._fixed)
-            {
-                // Calcular la aceleracion
-                n.vel += TimeStep / n.mass * n.force;     // Calcular velocidades
-                n.pos += TimeStep * n.vel;                      // Calcular posicion
-            }
-        }
-        foreach (Spring spring in springList)
-        {
-            spring.UpdateLength();
-        }
     }
 		
 }

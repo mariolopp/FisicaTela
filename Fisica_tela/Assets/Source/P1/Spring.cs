@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spring : MonoBehaviour {
+public class Spring : MassSpringCloth {
 
     public Node nodeA, nodeB;
 
@@ -11,6 +11,11 @@ public class Spring : MonoBehaviour {
 
     public float stiffness;
 
+    public Spring(Node nodeA, Node nodeB)
+    {
+        this.nodeA = nodeA;
+        this.nodeB = nodeB;
+    }
     // Use this for initialization
     void Start () {
         UpdateLength();
