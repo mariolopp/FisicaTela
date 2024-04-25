@@ -27,26 +27,22 @@ public class Node {
         pos = v;
         vel = Vector3.zero;
         force = Vector3.zero;
-        mass = 1f;
+        mass = 0.1f;
         _fixed = false;
         massSprClth = massSpringCloth;
     }
-    void Start () {
+    public void Start () {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	public void Update () {
         //transform.position = pos;
 	}
 
     public void ComputeForces()
     {
-        // Calcular la fuerza del nodo padre sobre este nodo
+        // Aplicar la fuerza de la gravedad sobre el nodo
         force += massSprClth.Gravity;
     }
 
-    public static implicit operator Vector3(Node v)
-    {
-        throw new NotImplementedException();
-    }
 }

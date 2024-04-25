@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using static UnityEditor.PlayerSettings;
 using UnityEditor.Experimental.GraphView;
+using System;
 
 public class MassSpringCloth : MonoBehaviour
 {
@@ -31,10 +32,11 @@ public class MassSpringCloth : MonoBehaviour
     public bool Paused;
     public float TimeStep;
     public Vector3 Gravity;
-    //public float stiffness = 10; asignar a los muelles
+    public float stiffness = 5f; //asignar a los muelles
     public Integration IntegrationMethod;
-    public List<Node> nodes = new List<Node>();        // Lista de nodos
+    public List<Node> nodeList;        // Lista de nodos
     public List<Spring> springList; // Lista de muelles
+    
 
     #endregion
 
@@ -45,7 +47,8 @@ public class MassSpringCloth : MonoBehaviour
     #region MonoBehaviour
     public void Awake()
     {
-
+        nodeList = new List<Node>();
+        springList = new List<Spring>();
     }
     public void Start()
     {
@@ -57,23 +60,66 @@ public class MassSpringCloth : MonoBehaviour
         Vector3[] vertices = mesh.vertices;     // Guarda la coordenada local del vertice
         int[] triangles = mesh.triangles;       // Guarda los indices de los vertices de un triangulo bajo un identificador de triangulo
 
-
+        
         // Transformar la posición del primer vértice a coordenadas globales
-        int i = 0;                      // Índice del primer vértice
-        pos = transform.TransformPoint(vertices[i]);
 
         foreach (Vector3 vertex in vertices)
         {
+
             // Crear un nuevo nodo con la posición del vértice
-            Node nodo = new Node(vertex, this);       // Utiliza un constructor que usa la referencia vertex y mspc
+            Node nodo = new Node(transform.TransformPoint(vertex), this);       // Utiliza un constructor que usa la referencia vertex y mspc
 
             // Agregar el nodo a la lista de nodos
-            nodes.Add(nodo);
+            nodeList.Add(nodo);
             //print("creado nodo en la pos "+nodo.pos);
 
         }
-        nodes[5]._fixed = true;
+        
+        nodeList[0]._fixed = true;
+        nodeList[1]._fixed = true;
+        nodeList[2]._fixed = true;
+        nodeList[3]._fixed = true;
+        nodeList[4]._fixed = true;
+        nodeList[5]._fixed = true;
+        nodeList[6]._fixed = true;
+        nodeList[7]._fixed = true;
+        nodeList[8]._fixed = true;
+        nodeList[9]._fixed = true;
+        nodeList[10]._fixed = true;
+        nodeList[0]._fixed = true;
+        nodeList[11]._fixed = true;
+        nodeList[12]._fixed = true;
+        nodeList[13]._fixed = true;
+        nodeList[14]._fixed = true;
+        nodeList[15]._fixed = true;
+        nodeList[16]._fixed = true;
+        nodeList[17]._fixed = true;
+        nodeList[18]._fixed = true;
+        nodeList[19]._fixed = true;
+        nodeList[20]._fixed = true;
 
+        for (int index = 0; index < triangles.Length-1; index+=3)
+        {
+
+            int index1 = triangles[index];
+            int index2 = triangles[index+1];
+            int index3 = triangles[index+2];
+
+            // Anyadir a los muelles cada par de nodos ya en coordenadas globales
+            springList.Add(new Spring(nodeList[index1], nodeList[index2], this));
+            springList.Add(new Spring(nodeList[index1], nodeList[index3], this));
+
+
+            springList.Add(new Spring(nodeList[index2], nodeList[index1], this));
+            springList.Add(new Spring(nodeList[index2], nodeList[index3], this));
+
+            springList.Add(new Spring(nodeList[index3], nodeList[index1], this));
+            springList.Add(new Spring(nodeList[index3], nodeList[index2], this));
+
+            //print("El primer nodo del spring es " + spring.nodeA.pos);
+            //print("El segundo nodo del spring es " + spring.nodeB.pos);
+        }
+                   
     }
 
     public void Update()
@@ -82,18 +128,18 @@ public class MassSpringCloth : MonoBehaviour
         Vector3[] vertices = new Vector3[mesh.vertexCount];
 
 
-
         // Refrescar la geometria igualando al array
         for (int i = 0; i < mesh.vertexCount; i++)
         {
-            // Convertir el vertice a coordenadas locales
-            vertices[i] = transform.InverseTransformPoint(nodes[i].pos);
+            // Convertir el vertice a coordenadas locales para devolver la actualización a la malla
+            vertices[i] = transform.InverseTransformPoint(nodeList[i].pos);
 
         }
         mesh.vertices = vertices;
 
+        
 
-        print("El vertice de la malla se ha movido a " + mesh.vertices[1]);
+        //print("El vertice de la malla se ha movido a " + mesh.vertices[1]);
     }
 
     public void FixedUpdate()
@@ -126,7 +172,7 @@ public class MassSpringCloth : MonoBehaviour
     /// </summary>
     private void stepSymplectic()       // Metodo de integracion
     {
-        foreach (Node n in nodes)
+        foreach (Node n in nodeList)
         {     // Recorremos los nodos existentes en la lista
             if (!n._fixed)
             {
@@ -139,7 +185,7 @@ public class MassSpringCloth : MonoBehaviour
         {
             spring.ComputeForces();     // Cada uno de los objetos que conoce unas ciertas cualidades es capaz de calcular las fuerzas
         }
-        foreach (Node n in nodes)
+        foreach (Node n in nodeList)
         {
             if (!n._fixed)
             {
