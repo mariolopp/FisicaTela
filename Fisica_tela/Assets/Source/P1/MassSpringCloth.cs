@@ -4,34 +4,35 @@ using System.Collections.Generic;
 using static UnityEditor.PlayerSettings;
 using UnityEditor.Experimental.GraphView;
 
-public class MassSpringCloth : MonoBehaviour 
+public class MassSpringCloth : MonoBehaviour
 {
-	/// <summary>
-	/// Default constructor. Zero all. 
-	/// </summary>
-	public MassSpringCloth()
-	{
-		this.Paused = true;
-		this.TimeStep = 0.01f;
-		this.Gravity = new Vector3 (0.0f, -9.81f, 0.0f);
-		this.IntegrationMethod = Integration.Symplectic;
-	}
+    /// <summary>
+    /// Default constructor. Zero all. 
+    /// </summary>
+    public MassSpringCloth()
+    {
+        this.Paused = true;
+        this.TimeStep = 0.01f;
+        this.Gravity = new Vector3(0.0f, -9.81f, 0.0f);
+        this.IntegrationMethod = Integration.Symplectic;
+    }
 
-	/// <summary>
-	/// Integration method.
-	/// </summary>
-	public enum Integration
-	{
-		Explicit = 0,
-		Symplectic = 1,
-	};
+    /// <summary>
+    /// Integration method.
+    /// </summary>
+    public enum Integration
+    {
+        Explicit = 0,
+        Symplectic = 1,
+    };
 
-	#region InEditorVariables
+    #region InEditorVariables
 
-	public bool Paused;
-	public float TimeStep;
+    public bool Paused;
+    public float TimeStep;
     public Vector3 Gravity;
-	public Integration IntegrationMethod;
+    //public float stiffness = 10; asignar a los muelles
+    public Integration IntegrationMethod;
     public List<Node> nodes = new List<Node>();        // Lista de nodos
     public List<Spring> springList; // Lista de muelles
 
@@ -55,7 +56,7 @@ public class MassSpringCloth : MonoBehaviour
         // Vertices y triangulos de la malla
         Vector3[] vertices = mesh.vertices;     // Guarda la coordenada local del vertice
         int[] triangles = mesh.triangles;       // Guarda los indices de los vertices de un triangulo bajo un identificador de triangulo
-       
+
 
         // Transformar la posición del primer vértice a coordenadas globales
         int i = 0;                      // Índice del primer vértice
@@ -64,29 +65,35 @@ public class MassSpringCloth : MonoBehaviour
         foreach (Vector3 vertex in vertices)
         {
             // Crear un nuevo nodo con la posición del vértice
-            Node nodo = new Node(vertex);       // Creo que tengo que implementar un constructor
-
+            Node nodo = new Node(vertex, this);       // Utiliza un constructor que usa la referencia vertex y mspc
 
             // Agregar el nodo a la lista de nodos
             nodes.Add(nodo);
-            print("creado nodo en la pos "+nodo.pos);
-            
+            //print("creado nodo en la pos "+nodo.pos);
+
         }
-        nodes[0]._fixed = true;
-        
+        nodes[5]._fixed = true;
+
     }
 
     public void Update()
-	{
+    {
         Mesh mesh = this.GetComponent<MeshFilter>().mesh;
         Vector3[] vertices = new Vector3[mesh.vertexCount];
 
-        int i = 0;
-        // Convertir el vertice a coordenadas locales
-        vertices[i] = transform.InverseTransformPoint(pos);
+
 
         // Refrescar la geometria igualando al array
+        for (int i = 0; i < mesh.vertexCount; i++)
+        {
+            // Convertir el vertice a coordenadas locales
+            vertices[i] = transform.InverseTransformPoint(nodes[i].pos);
+
+        }
         mesh.vertices = vertices;
+
+
+        print("El vertice de la malla se ha movido a " + mesh.vertices[1]);
     }
 
     public void FixedUpdate()
@@ -111,14 +118,14 @@ public class MassSpringCloth : MonoBehaviour
     /// Performs a simulation step in 1D using Explicit integration.
     /// </summary>
     private void stepExplicit()
-	{
-	}
+    {
+    }
 
-	/// <summary>
-	/// Performs a simulation step in 1D using Symplectic integration.
-	/// </summary>
-	private void stepSymplectic()       // Metodo de integracion
-	{
+    /// <summary>
+    /// Performs a simulation step in 1D using Symplectic integration.
+    /// </summary>
+    private void stepSymplectic()       // Metodo de integracion
+    {
         foreach (Node n in nodes)
         {     // Recorremos los nodos existentes en la lista
             if (!n._fixed)
@@ -145,7 +152,7 @@ public class MassSpringCloth : MonoBehaviour
         {
             spring.UpdateLength();
         }
-        print("nodo en la pos " + nodes[1].pos);
+        //print("nodo en la pos " + nodes[1].pos);
     }
-		
+
 }
