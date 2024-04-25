@@ -17,11 +17,14 @@ public class Node {
     private void Awake()
     {
         //pos = transform.position;
-        vel = Vector3.zero;
+        
     }
     public Node(Vector3 v) { // Constructor dado un vertice (Vec3)
         pos = v;
-        vel = Vector3.zero;    
+        vel = Vector3.zero;
+        force = Vector3.zero;
+        mass = 1f;
+        _fixed = false;
     }
     void Start () {
 	}

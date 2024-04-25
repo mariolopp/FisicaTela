@@ -32,7 +32,7 @@ public class MassSpringCloth : MonoBehaviour
 	public float TimeStep;
     public Vector3 Gravity;
 	public Integration IntegrationMethod;
-    public List<Node> nodes;        // Lista de nodos
+    public List<Node> nodes = new List<Node>();        // Lista de nodos
     public List<Spring> springList; // Lista de muelles
 
     #endregion
@@ -44,7 +44,7 @@ public class MassSpringCloth : MonoBehaviour
     #region MonoBehaviour
     public void Awake()
     {
-        this.nodes = new List<Node>();
+
     }
     public void Start()
     {
@@ -70,8 +70,10 @@ public class MassSpringCloth : MonoBehaviour
             // Agregar el nodo a la lista de nodos
             nodes.Add(nodo);
             print("creado nodo en la pos "+nodo.pos);
+            
         }
-
+        nodes[0]._fixed = true;
+        
     }
 
     public void Update()
@@ -117,31 +119,33 @@ public class MassSpringCloth : MonoBehaviour
 	/// </summary>
 	private void stepSymplectic()       // Metodo de integracion
 	{
-        //foreach (Node n in nodes) {     // Recorremos los nodos existentes en la lista
-        //    if (!n._fixed)
-        //    {
-        //        // Calcular la fuerza sobre los nodos
-        //        n.force = Vector3.zero;       // Resetea la fuerza de la particula
-        //        n.ComputeForces();            // Calcula su propia nueva fuerza
-        //    }
-        //}
-        //foreach (Spring spring in springList)
-        //{
-        //    spring.ComputeForces();     // Cada uno de los objetos que conoce unas ciertas cualidades es capaz de calcular las fuerzas
-        //}
-        //foreach (Node n in nodes)
-        //{
-        //    if (!n._fixed)
-        //    {
-        //        // Calcular la aceleracion
-        //        n.vel += TimeStep / n.mass * n.force;     // Calcular velocidades
-        //        n.pos += TimeStep * n.vel;                      // Calcular posicion
-        //    }
-        //}
-        //foreach (Spring spring in springList)
-        //{
-        //    spring.UpdateLength();
-        //}
+        foreach (Node n in nodes)
+        {     // Recorremos los nodos existentes en la lista
+            if (!n._fixed)
+            {
+                // Calcular la fuerza sobre los nodos
+                n.force = Vector3.zero;       // Resetea la fuerza de la particula
+                n.ComputeForces();            // Calcula su propia nueva fuerza
+            }
+        }
+        foreach (Spring spring in springList)
+        {
+            spring.ComputeForces();     // Cada uno de los objetos que conoce unas ciertas cualidades es capaz de calcular las fuerzas
+        }
+        foreach (Node n in nodes)
+        {
+            if (!n._fixed)
+            {
+                // Calcular la aceleracion
+                n.vel = n.vel + ((TimeStep / n.mass) * n.force);     // Calcular velocidades
+                n.pos += TimeStep * n.vel;                      // Calcular posicion
+            }
+        }
+        foreach (Spring spring in springList)
+        {
+            spring.UpdateLength();
+        }
+        print("nodo en la pos " + nodes[1].pos);
     }
 		
 }
