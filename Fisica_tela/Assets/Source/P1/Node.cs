@@ -11,7 +11,6 @@ public class Node {
     public Vector3 vel;
     public Vector3 force;
     public bool _fixed;
-    public float mass;
     private MassSpringCloth massSprClth;
 
     // Use this for initialization
@@ -27,22 +26,13 @@ public class Node {
         pos = v;
         vel = Vector3.zero;
         force = Vector3.zero;
-        mass = 0.1f;
         _fixed = false;
         massSprClth = massSpringCloth;
     }
-    public void Start () {
-	}
-	
-	// Update is called once per frame
-	public void Update () {
-        //transform.position = pos;
-	}
-
     public void ComputeForces()
     {
         // Aplicar la fuerza de la gravedad sobre el nodo
-        force += massSprClth.Gravity;
+        force += massSprClth.mass * massSprClth.Gravity;
     }
 
 }

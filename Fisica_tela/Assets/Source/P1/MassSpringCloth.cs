@@ -32,7 +32,8 @@ public class MassSpringCloth : MonoBehaviour
     public bool Paused;
     public float TimeStep;
     public Vector3 Gravity;
-    public float stiffness = 5f; //asignar a los muelles
+    public float stiffness = 50f; //asignar a los muelles
+    public float mass = 1.0f;
     public Integration IntegrationMethod;
     public List<Node> nodeList;        // Lista de nodos
     public List<Spring> springList; // Lista de muelles
@@ -49,9 +50,6 @@ public class MassSpringCloth : MonoBehaviour
     {
         nodeList = new List<Node>();
         springList = new List<Spring>();
-    }
-    public void Start()
-    {
         Paused = false;
         // Malla asociada al game Object
         Mesh mesh = this.GetComponent<MeshFilter>().mesh;
@@ -74,29 +72,10 @@ public class MassSpringCloth : MonoBehaviour
             //print("creado nodo en la pos "+nodo.pos);
 
         }
+        for (int i = 0; i <= 20; i++) {
+            nodeList[i]._fixed = true;
+        }
         
-        nodeList[0]._fixed = true;
-        nodeList[1]._fixed = true;
-        nodeList[2]._fixed = true;
-        nodeList[3]._fixed = true;
-        nodeList[4]._fixed = true;
-        nodeList[5]._fixed = true;
-        nodeList[6]._fixed = true;
-        nodeList[7]._fixed = true;
-        nodeList[8]._fixed = true;
-        nodeList[9]._fixed = true;
-        nodeList[10]._fixed = true;
-        nodeList[0]._fixed = true;
-        nodeList[11]._fixed = true;
-        nodeList[12]._fixed = true;
-        nodeList[13]._fixed = true;
-        nodeList[14]._fixed = true;
-        nodeList[15]._fixed = true;
-        nodeList[16]._fixed = true;
-        nodeList[17]._fixed = true;
-        nodeList[18]._fixed = true;
-        nodeList[19]._fixed = true;
-        nodeList[20]._fixed = true;
 
         for (int index = 0; index < triangles.Length-1; index+=3)
         {
@@ -108,13 +87,13 @@ public class MassSpringCloth : MonoBehaviour
             // Anyadir a los muelles cada par de nodos ya en coordenadas globales
             springList.Add(new Spring(nodeList[index1], nodeList[index2], this));
             springList.Add(new Spring(nodeList[index1], nodeList[index3], this));
-
-
-            springList.Add(new Spring(nodeList[index2], nodeList[index1], this));
             springList.Add(new Spring(nodeList[index2], nodeList[index3], this));
 
-            springList.Add(new Spring(nodeList[index3], nodeList[index1], this));
-            springList.Add(new Spring(nodeList[index3], nodeList[index2], this));
+            //springList.Add(new Spring(nodeList[index2], nodeList[index1], this));
+            //springList.Add(new Spring(nodeList[index2], nodeList[index3], this));
+
+            //springList.Add(new Spring(nodeList[index3], nodeList[index1], this));
+            //springList.Add(new Spring(nodeList[index3], nodeList[index2], this));
 
             //print("El primer nodo del spring es " + spring.nodeA.pos);
             //print("El segundo nodo del spring es " + spring.nodeB.pos);
@@ -135,7 +114,14 @@ public class MassSpringCloth : MonoBehaviour
             vertices[i] = transform.InverseTransformPoint(nodeList[i].pos);
 
         }
+        //foreach (Node n in nodeList) { 
+        //    transform.TransformPoint(n.pos);
+        //}
+
+
         mesh.vertices = vertices;
+
+
 
         
 
@@ -180,6 +166,12 @@ public class MassSpringCloth : MonoBehaviour
                 n.force = Vector3.zero;       // Resetea la fuerza de la particula
                 n.ComputeForces();            // Calcula su propia nueva fuerza
             }
+            //else if (n.pos){ 
+                // Si un nodo esta dentro de un objeto de tipo Fixed,
+                // este actuacizará su posición acorde a como se mueva este objeto
+
+
+            //}
         }
         foreach (Spring spring in springList)
         {
@@ -190,7 +182,7 @@ public class MassSpringCloth : MonoBehaviour
             if (!n._fixed)
             {
                 // Calcular la aceleracion
-                n.vel = n.vel + ((TimeStep / n.mass) * n.force);     // Calcular velocidades
+                n.vel = n.vel + ((TimeStep / mass) * n.force);     // Calcular velocidades
                 n.pos += TimeStep * n.vel;                      // Calcular posicion
             }
         }
