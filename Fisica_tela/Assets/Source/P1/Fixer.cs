@@ -64,6 +64,7 @@ public class Fixer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         Bounds bounds = GetComponent<Collider>().bounds;    // Obtener el collider del objeto fixed
 
         int i = 0;
