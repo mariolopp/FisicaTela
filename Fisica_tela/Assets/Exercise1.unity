@@ -330,6 +330,7 @@ GameObject:
   - component: {fileID: 573811460}
   - component: {fileID: 573811459}
   - component: {fileID: 573811458}
+  - component: {fileID: 573811462}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Fixed
@@ -423,6 +424,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &573811462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573811457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77168eae4f62b724aac0675faa966869, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cloth: {fileID: 1952780229}
 --- !u!1 &1952780224
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,7 +452,7 @@ GameObject:
   - component: {fileID: 1952780229}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Cloth
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -542,9 +556,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fdf5f7146b4f3b498a53b99d836a63b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Paused: 0
+  Paused: 1
   TimeStep: 0.01
   Gravity: {x: 0, y: -9.81, z: 0}
-  stiffness: 300
+  stiffness: 100
   mass: 1
   IntegrationMethod: 1

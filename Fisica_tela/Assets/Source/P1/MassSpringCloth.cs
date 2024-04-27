@@ -72,9 +72,9 @@ public class MassSpringCloth : MonoBehaviour
             //print("creado nodo en la pos "+nodo.pos);
 
         }
-        for (int i = 0; i <= 20; i++) {
-            nodeList[i]._fixed = true;
-        }
+        //for (int i = 0; i <= 20; i++) {
+        //    nodeList[i]._fixed = true;
+        //}
         
 
         for (int index = 0; index < triangles.Length-1; index+=3)
