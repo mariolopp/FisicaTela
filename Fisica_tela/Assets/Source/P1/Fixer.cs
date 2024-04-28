@@ -19,12 +19,11 @@ public class Fixer : MonoBehaviour
     }
     void Start()
     {
-        
-        //objectsWithTag = GameObject.FindGameObjectsWithTag("Fixer");
         cloths = GameObject.FindGameObjectsWithTag("Cloth");
         if (cloths != null)
         {
             cloth = cloths[0].GetComponent<MassSpringCloth>();
+            
             nodes = cloth.nodeList;      // Referencia a la lista de nodos de la prenda
             localPos = new Vector3[nodes.Count];  // inicializamos a la cantidad de nodos
             int a = 0;

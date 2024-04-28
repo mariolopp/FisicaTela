@@ -106,7 +106,7 @@ public class MassSpringCloth : MonoBehaviour
         //Array.Sort(ansidxs);
         for (int index = 0; index < triangles.Length - 1; index += 3)
         {
-            Debug.Log(triangles[index] + " " + triangles[index + 1] + " " + triangles[index + 1]);
+            //Debug.Log(triangles[index] + " " + triangles[index + 1] + " " + triangles[index + 1]);
             int index1 = triangles[index];
             int index2 = triangles[index + 1];
             int index3 = triangles[index + 2];
@@ -139,11 +139,11 @@ public class MassSpringCloth : MonoBehaviour
 
 
 
-                for (int index = 0; index < triangles.Length-1; index+=3)
-        {
-            Debug.Log(triangles[index] + " " + triangles[index+1] + " " + triangles[index+1]);
+        //        for (int index = 0; index < triangles.Length-1; index+=3)
+        //{
+        //    //Debug.Log(triangles[index] + " " + triangles[index+1] + " " + triangles[index+1]);
 
-        }
+        //}
                    
     }
 
