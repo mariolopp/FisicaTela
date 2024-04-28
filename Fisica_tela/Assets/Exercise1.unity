@@ -216,14 +216,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 291069688}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4.17, z: -10}
+  m_LocalRotation: {x: -0.0043947673, y: -0.9016967, z: 0.43233597, w: -0.0030613854}
+  m_LocalPosition: {x: -9.5, y: 17.4, z: 15.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 51.233, y: -180.157, z: 0.483}
 --- !u!1 &324840730
 GameObject:
   m_ObjectHideFlags: 0
@@ -655,7 +655,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 573811457}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.16, y: 0.15, z: 6.76}
+  m_LocalPosition: {x: -2.16, y: 0.15, z: 6.04}
   m_LocalScale: {x: 10.821702, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -954,6 +954,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cloth: {fileID: 1952780229}
+  coef_sphere: 1.4
 --- !u!135 &1554770239
 SphereCollider:
   m_ObjectHideFlags: 0

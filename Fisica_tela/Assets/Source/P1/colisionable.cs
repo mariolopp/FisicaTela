@@ -14,6 +14,7 @@ public class Colisionable : MonoBehaviour
     List<Node> nodes;
     Vector3[] localPos;     // Coordenadas locales de los vertices respecto al fixer
     bool[] nodesInside;        // Guarda si el node estaba inicialmente dentro del fixer
+    public float coef_sphere = 1.4f;
     private void Awake()
     {
 
@@ -61,7 +62,7 @@ public class Colisionable : MonoBehaviour
             if (isInside)
             {
                 //n.g_enabled = false;    // Si colisiona seteamos a 0 su fuerza hacia abajo
-                n.coef = transform.localScale.x / ((n.pos - transform.position).magnitude*1.4f);  // A mas cerca del centro mas alto el coeficiente
+                n.coef = transform.localScale.x / ((n.pos - transform.position).magnitude*coef_sphere);  // A mas cerca del centro mas alto el coeficiente
                 
             }
             else

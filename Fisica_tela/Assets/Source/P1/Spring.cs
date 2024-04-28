@@ -14,6 +14,7 @@ public class Spring {
     public float stiffness;
     public float mass;
     public float d;
+    public float amortigua_factor = 0.005f;
     public Quaternion rotation;
 
     public Spring(Node nodeA, Node nodeB, MassSpringCloth mspc)
@@ -56,7 +57,7 @@ public class Spring {
         u.Normalize();
         
         // Tamanyo del vector en la dirección del vector unnitario
-        Vector3 amortiguamiento = -(stiffness*0.005f) * (Vector3.Dot(nodeA.vel - nodeB.vel, u))*u;  // −𝑑 𝑢 ⋅ 𝑣𝑎 − 𝑣𝑏 𝑢 
+        Vector3 amortiguamiento = -(stiffness*amortigua_factor) * (Vector3.Dot(nodeA.vel - nodeB.vel, u))*u;  // −𝑑 𝑢 ⋅ 𝑣𝑎 − 𝑣𝑏 𝑢 
         
         Vector3 force = (-stiffness) * (Length - Length0) * u + amortiguamiento;   // Formula de la fuerza elástica
         nodeA.force += force;
