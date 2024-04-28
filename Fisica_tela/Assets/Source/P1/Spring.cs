@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,6 +12,8 @@ public class Spring {
     public float Length;
     public Vector3 position;
     public float stiffness;
+    public float mass;
+    public float d;
     public Quaternion rotation;
 
     public Spring(Node nodeA, Node nodeB, MassSpringCloth mspc)
@@ -18,7 +21,8 @@ public class Spring {
         this.nodeA = nodeA;
         this.nodeB = nodeB;
         stiffness = mspc.stiffness;
-
+        mass = mspc.mass;
+        d = stiffness / mass;
         // Guardar una longitud inicial para tener como referencia
         UpdateLength();
         Length0 = Length;
@@ -50,10 +54,10 @@ public class Spring {
     {
         Vector3 u = nodeA.pos - nodeB.pos;      // Vector que une las posiciones de los dos nodos
         u.Normalize();
-        //Vector3 amortiguamiento = -d * u * (nodeA.pos - nodeB.pos) * u;                // −𝑑 𝑢 ⋅ 𝑣𝑎 − 𝑣𝑏 𝑢
-        Vector3 viento = -2f*(nodeA.vel - nodeB.vel);
+        Vector3 viento = -(mass*1f) * (Vector3.Dot(nodeA.vel - nodeB.vel, u))*u;  // −𝑑 𝑢 ⋅ 𝑣𝑎 − 𝑣𝑏 𝑢
         Vector3 force = (-stiffness) * (Length - Length0) * u + viento;   // Formula de la fuerza elástica
         nodeA.force += force;
         nodeB.force -= force;
+
     }
 }

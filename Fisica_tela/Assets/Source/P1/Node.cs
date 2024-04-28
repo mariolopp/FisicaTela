@@ -33,6 +33,8 @@ public class Node {
     {
         // Aplicar la fuerza de la gravedad sobre el nodo
         force += massSprClth.mass * massSprClth.Gravity;
+        Vector3 viento = -(massSprClth.mass*1) * vel;
+        force += viento;
     }
 
 }

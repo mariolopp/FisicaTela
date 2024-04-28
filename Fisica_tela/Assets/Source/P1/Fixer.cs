@@ -47,14 +47,14 @@ public class Fixer : MonoBehaviour
 
                 Vector3 globalPos = transform.TransformPoint(localPos[i]);    // aplicar la transformación que haya tenido el fixer al vertice
                 //print(n.pos);
-                n.pos = globalPos;                                         // Aplicar las coordenadas globales aplicadas a dicho vertice
+                n.pos = globalPos;                                            // Aplicar las coordenadas globales aplicadas a dicho vertice
                 //print("new " + n.pos);
                 isInside = true;
                 nodesInside[i] = true;
             }
             else
             {
-                n._fixed = false; // Si el vertice no esta agarrado las fisicas le afectan
+                n._fixed = false;       // Si el vertice no esta agarrado las fisicas le afectan
             }
             i++;
         }
