@@ -54,8 +54,11 @@ public class Spring {
     {
         Vector3 u = nodeA.pos - nodeB.pos;      // Vector que une las posiciones de los dos nodos
         u.Normalize();
-        Vector3 viento = -(mass*1f) * (Vector3.Dot(nodeA.vel - nodeB.vel, u))*u;  // −𝑑 𝑢 ⋅ 𝑣𝑎 − 𝑣𝑏 𝑢
-        Vector3 force = (-stiffness) * (Length - Length0) * u + viento;   // Formula de la fuerza elástica
+        
+        // Tamanyo del vector en la dirección del vector unnitario
+        Vector3 amortiguamiento = -(stiffness*0.005f) * (Vector3.Dot(nodeA.vel - nodeB.vel, u))*u;  // −𝑑 𝑢 ⋅ 𝑣𝑎 − 𝑣𝑏 𝑢 
+        
+        Vector3 force = (-stiffness) * (Length - Length0) * u + amortiguamiento;   // Formula de la fuerza elástica
         nodeA.force += force;
         nodeB.force -= force;
 

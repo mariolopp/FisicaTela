@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using static UnityEditor.PlayerSettings;
 using UnityEditor.Experimental.GraphView;
 using System;
+using System.Linq;
+using System.Reflection;
 
 public class MassSpringCloth : MonoBehaviour
 {
@@ -37,8 +39,27 @@ public class MassSpringCloth : MonoBehaviour
     public Integration IntegrationMethod;
     public List<Node> nodeList;        // Lista de nodos
     public List<Spring> springList; // Lista de muelles
+    public float stiffness_traccion;
+    public float stiffness_flexion;
+    //public List<int[]> aristas;       // Array de arrays de 3 ints
+    struct Edges {  // Estructura de una arista
+        // Arista base definida por dos vertices, que se ordenan de menor a mayor
+        int vertex1;
+        int vertex2;
+        //public Edges(int v1, int v2) {
+        //    if (v1 < v2)
+        //    {
+        //        vertex1 = v2;
+        //        vertex1 = v1;
+        //    }
+        //    else {
+        //        vertex1 = v2;
+        //        vertex2 = v1;
+        //    }
+        //}
     
-
+    
+    }
     #endregion
 
     #region OtherVariables
@@ -50,6 +71,8 @@ public class MassSpringCloth : MonoBehaviour
     {
         nodeList = new List<Node>();
         springList = new List<Spring>();
+        //aristas = new List<int[]>();  // Guarda vertices asociados a un triangulo ordenados de menor a mayor
+        
         Paused = false;
         // Malla asociada al game Object
         Mesh mesh = this.GetComponent<MeshFilter>().mesh;
@@ -57,8 +80,8 @@ public class MassSpringCloth : MonoBehaviour
         // Vertices y triangulos de la malla
         Vector3[] vertices = mesh.vertices;     // Guarda la coordenada local del vertice
         int[] triangles = mesh.triangles;       // Guarda los indices de los vertices de un triangulo bajo un identificador de triangulo
+        //tr_ord = new int[triangles.Length*3];
 
-        
         // Transformar la posición del primer vértice a coordenadas globales
 
         foreach (Vector3 vertex in vertices)
@@ -75,28 +98,51 @@ public class MassSpringCloth : MonoBehaviour
         //for (int i = 0; i <= 20; i++) {
         //    nodeList[i]._fixed = true;
         //}
-        
 
-        for (int index = 0; index < triangles.Length-1; index+=3)
+        //int ansindex1 = triangles[0];
+        //int ansindex2 = triangles[1];
+        //int ansindex3 = triangles[2];
+        //int[] ansidxs = { ansindex1, ansindex2, ansindex3 };
+        //Array.Sort(ansidxs);
+        for (int index = 0; index < triangles.Length - 1; index += 3)
         {
-
+            Debug.Log(triangles[index] + " " + triangles[index + 1] + " " + triangles[index + 1]);
             int index1 = triangles[index];
-            int index2 = triangles[index+1];
-            int index3 = triangles[index+2];
-
-            // Anyadir a los muelles cada par de nodos ya en coordenadas globales
+            int index2 = triangles[index + 1];
+            int index3 = triangles[index + 2];
             springList.Add(new Spring(nodeList[index1], nodeList[index2], this));
             springList.Add(new Spring(nodeList[index1], nodeList[index3], this));
             springList.Add(new Spring(nodeList[index2], nodeList[index3], this));
 
-            //springList.Add(new Spring(nodeList[index2], nodeList[index1], this));
-            //springList.Add(new Spring(nodeList[index2], nodeList[index3], this));
+        }
+        // Ordenar la lista de triangulos
+        for (int i = 0; i < triangles.Length; i = i + 3)   // Recorro triangulos
+        {
+            //for (int j = 0; j < 3; j++)                     // Recorrer sus aristas
+            //{
+            //    // Edge auxiliar 
+            //    auxEdge = new Edge(triangulos[i + indices[j]], triangulos[i + indices[j + 1]]);
+            //    if (!opuesto.ContainsKey(auxEdge))
+            //    {
+            //        // Añadir spring 
+            //        // Añadir spring opuesto
+            //        springs.Add(new Spring(nodes[triangulos[i + indices[j]]], nodes[triangulos[i + indices[j + 1]]], StiffnessTraccion));
+            //        opuesto.Add(auxEdge, triangulos[i + indices[j + 2]]);
 
-            //springList.Add(new Spring(nodeList[index3], nodeList[index1], this));
-            //springList.Add(new Spring(nodeList[index3], nodeList[index2], this));
+            //    }
+            //    else
+            //    {
+            //        springs.Add(new Spring(nodes[opuesto[auxEdge]], nodes[triangulos[i + indices[j + 2]]], StiffnessFlexion));
+            //    }
+            //}
+        }
 
-            //print("El primer nodo del spring es " + spring.nodeA.pos);
-            //print("El segundo nodo del spring es " + spring.nodeB.pos);
+
+
+                for (int index = 0; index < triangles.Length-1; index+=3)
+        {
+            Debug.Log(triangles[index] + " " + triangles[index+1] + " " + triangles[index+1]);
+
         }
                    
     }
@@ -117,8 +163,6 @@ public class MassSpringCloth : MonoBehaviour
         //foreach (Node n in nodeList) { 
         //    transform.TransformPoint(n.pos);
         //}
-
-
         mesh.vertices = vertices;
 
 
@@ -169,8 +213,6 @@ public class MassSpringCloth : MonoBehaviour
             //else if (n.pos){ 
                 // Si un nodo esta dentro de un objeto de tipo Fixed,
                 // este actuacizará su posición acorde a como se mueva este objeto
-
-
             //}
         }
         foreach (Spring spring in springList)
@@ -194,3 +236,47 @@ public class MassSpringCloth : MonoBehaviour
     }
 
 }
+//if (a[0] == idxs[0] & a[1] == idxs[1])
+//{
+//    int[] arista = { a[2], idxs[2] };
+//    Array.Sort(arista);
+//    // Introducimos una arista con los vertices opuestos
+//    springList.Add(new Spring(nodeList[arista[0]], nodeList[arista[1]], this));
+//    existe = true;
+//}
+
+//int index1 = triangles[index];
+//int index2 = triangles[index + 1];
+//int index3 = triangles[index + 2];
+//Debug.Log(index1 + " " + index2 + " " + index3);
+//// Indices de nodo
+//int[] idxs = { index1, index2, index3 };
+//Array.Sort(idxs);        // Ordenar los indices de menor a mayor
+//                         //Vector3 i_ord = new Vector3(indexes[0], indexes[1], indexes[2]);
+//                         // Anyadir a los muelles cada par de nodos ya en coordenadas globales
+
+//bool existe = false;
+//// Si existe un triangulo que este usando la misma arista que la que queríamos introducir..    
+
+//if (existe)
+//{
+//    springList.Add(new Spring(nodeList[idxs[]], nodeList[index2], this));
+//    springList.Add(new Spring(nodeList[index1], nodeList[index3], this));
+//}
+//else
+//{
+//    springList.Add(new Spring(nodeList[index1], nodeList[index2], this));
+//    springList.Add(new Spring(nodeList[index1], nodeList[index3], this));
+//    springList.Add(new Spring(nodeList[index2], nodeList[index3], this));
+//}
+
+
+
+//springList.Add(new Spring(nodeList[index2], nodeList[index1], this));
+//springList.Add(new Spring(nodeList[index2], nodeList[index3], this));
+
+//springList.Add(new Spring(nodeList[index3], nodeList[index1], this));
+//springList.Add(new Spring(nodeList[index3], nodeList[index2], this));
+
+//print("El primer nodo del spring es " + spring.nodeA.pos);
+//print("El segundo nodo del spring es " + spring.nodeB.pos);

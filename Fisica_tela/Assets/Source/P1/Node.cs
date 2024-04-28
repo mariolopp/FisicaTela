@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -11,6 +12,8 @@ public class Node {
     public Vector3 vel;
     public Vector3 force;
     public bool _fixed;
+    public bool g_enabled = true;
+    public float coef;
     private MassSpringCloth massSprClth;
 
     // Use this for initialization
@@ -33,8 +36,15 @@ public class Node {
     {
         // Aplicar la fuerza de la gravedad sobre el nodo
         force += massSprClth.mass * massSprClth.Gravity;
-        Vector3 viento = -(massSprClth.mass*1) * vel;
+        Vector3 viento = -(massSprClth.mass*3f) * vel;
         force += viento;
+        if (coef>0) {    // Si esta colisionando la fuerza hacia abajo se setea a 0
+            force = (-force* coef);
+            vel = (-vel * coef);
+            // Habria que buscar la normal al objeto con el que colisiona y ejercer una fuerza contraria
+            // parecida a la que traiga el nodo
+        }
+        
     }
 
 }
