@@ -10,7 +10,7 @@ public class Colisionable : MonoBehaviour
     // Start is called before the first frame update
     //GameObject[] objectsWithTag;
     GameObject[] cloths;
-    public MassSpringCloth cloth;
+    public tetraEdroGenerator cloth;
     List<Node> nodes;
     Vector3[] localPos;     // Coordenadas locales de los vertices respecto al fixer
     bool[] nodesInside;        // Guarda si el node estaba inicialmente dentro del fixer
@@ -25,7 +25,7 @@ public class Colisionable : MonoBehaviour
         cloths = GameObject.FindGameObjectsWithTag("Cloth");
         if (cloths != null)
         {
-            cloth = cloths[0].GetComponent<MassSpringCloth>();
+            cloth = cloths[0].GetComponent<tetraEdroGenerator>();
             nodes = cloth.nodeList;      // Referencia a la lista de nodos de la prenda
         }
         nodesInside = new bool[nodes.Count];       

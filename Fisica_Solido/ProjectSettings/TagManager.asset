@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Fixed
   - Cloth
+  - edro
   layers:
   - Default
   - TransparentFX

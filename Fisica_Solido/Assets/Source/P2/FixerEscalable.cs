@@ -4,13 +4,20 @@ using System.Linq;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using static UnityEditor.PlayerSettings;
+
 public class FixerEscalable : MonoBehaviour
 {
     // Start is called before the first frame update
     //GameObject[] objectsWithTag;
     GameObject[] cloths;
-    public MassSpringCloth[] obj_cloths;
-    public struct fixable_cloths{
+    public tetraEdroGenerator[] obj_cloths;
+    public struct fixable_cloths
+    {
         public List<Node> nodes;        // Lista de nodos de cada prenda
         public Vector3[] localPos;      // Coordenadas locales de los vertices respecto al fixer
         public bool[] nodesInside;      // Guarda si el node estaba inicialmente dentro del fixer
@@ -18,25 +25,25 @@ public class FixerEscalable : MonoBehaviour
     fixable_cloths[] obj_fixable;
     private void Awake()
     {
-        
+
     }
     void Start()
     {
 
         //objectsWithTag = GameObject.FindGameObjectsWithTag("Fixer");
 
-        cloths = GameObject.FindGameObjectsWithTag("Cloth");
+        cloths = GameObject.FindGameObjectsWithTag("edro");
 
 
 
         if (cloths != null)
         {
             obj_fixable = new fixable_cloths[cloths.Length];    // Tantos structs como prendas
-            obj_cloths = new MassSpringCloth[cloths.Length];
+            obj_cloths = new tetraEdroGenerator[cloths.Length];
             int i = 0;
             foreach (GameObject c in cloths)
             {
-                obj_cloths[i] = c.GetComponent<MassSpringCloth>();
+                obj_cloths[i] = c.GetComponent<tetraEdroGenerator>();
                 i++;
             }
 
@@ -59,7 +66,7 @@ public class FixerEscalable : MonoBehaviour
 
         Bounds bounds = GetComponent<Collider>().bounds;    // Obtener el collider del objeto fixed
         int j = 0;
-        foreach (MassSpringCloth c in obj_cloths)
+        foreach (tetraEdroGenerator c in obj_cloths)
         {
             int i = 0;
             foreach (Node n in obj_fixable[j].nodes)
@@ -84,7 +91,7 @@ public class FixerEscalable : MonoBehaviour
             }
             j++;
         }
-        
+
 
     }
 
@@ -94,7 +101,7 @@ public class FixerEscalable : MonoBehaviour
 
         Bounds bounds = GetComponent<Collider>().bounds;    // Obtener el collider del objeto fixer
         int j = 0;
-        foreach (MassSpringCloth c in obj_cloths)
+        foreach (tetraEdroGenerator c in obj_cloths)
         {
             int i = 0;
             foreach (Node n in obj_fixable[j].nodes)
@@ -115,3 +122,4 @@ public class FixerEscalable : MonoBehaviour
         }
     }
 }
+
