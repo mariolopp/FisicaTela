@@ -127,7 +127,6 @@ public class tetraEdroGenerator : MonoBehaviour
     {
         if (this.Paused)
             return; // Not simulating
-        print("adios");
         // Select integration method
         this.stepSymplectic();
 
@@ -164,12 +163,8 @@ public class tetraEdroGenerator : MonoBehaviour
         {
             spring.UpdateLength();
         }
-        print("nodo en la pos " + nodeList[1].pos);
+        //print("nodo en la pos " + nodeList[1].pos);
 
-    }
-    private void stepExplicit()
-    {
-        print("explicit");
     }
     void OnDrawGizmos()
     {
