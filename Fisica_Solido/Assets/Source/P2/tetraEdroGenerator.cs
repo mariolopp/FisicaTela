@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
-
+using System.Globalization;
+using System;
 
 public class tetraEdroGenerator : MonoBehaviour
 {
@@ -10,15 +11,13 @@ public class tetraEdroGenerator : MonoBehaviour
     public float TimeStep;
     public Vector3 Gravity;
     public float stiffness = 50f; //asignar a los muelles
-    public float mass = 1.0f;
+    public float mass = 1000.0f;
     public Integration IntegrationMethod;
     public List<Node> nodeList;        // Lista de nodos
     public List<Spring> springList; // Lista de muelles
     public float stiffness_traccion;
     public float stiffness_flexion;
     //public List<int[]> aristas;       // Array de arrays de 3 ints
-    public Mesh tetra;
-    public MeshFilter tetraFilter;
     struct Edges
     {  // Estructura de una arista
         // Arista base definida por dos vertices, que se ordenan de menor a mayor
@@ -32,8 +31,12 @@ public class tetraEdroGenerator : MonoBehaviour
     };
     #endregion
 
-    public TextAsset submarino;
-
+    #region meshVariables
+    public TextAsset fileName;
+    public TextAsset tetraedros;
+    public Mesh tetra;
+    public MeshFilter tetraFilter;
+    #endregion
     public void Awake() {
         nodeList = new List<Node>();
         springList = new List<Spring>();
@@ -46,32 +49,97 @@ public class tetraEdroGenerator : MonoBehaviour
         Paused = false;
         // Malla asociada al game Object
         tetra = new Mesh();
-        
 
 
+
+        string[] textString = fileName.text.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+        string[] tetraString = tetraedros.text.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+
+        int numNodes = int.Parse(textString[0]);
+        int numCoord = int.Parse(textString[1]);
+
+        int numTetraedros = int.Parse(tetraString[0]);
+        // NOTA: 
+        // Para parsear números flotantes hay que tener en
+        // cuenta el formato de número en el que está escrito.
+        // Para ello hay que instanciar un objeto de la clase
+        // CultureInfo que almacena información de localización. 
+        // Los números con "." como separador decimal como 1.425
+        // tienen localización de EEUU, "en-US".
+
+        CultureInfo locale = new CultureInfo("en-US");
+        float valor = float.Parse("1.425", locale);
+
+        tetra = new Mesh();
         // Vertices y triangulos de la malla
-        Vector3[] vertices = new Vector3[] {
-            new Vector3(1, 1, 1),   // Vértice 0
-            new Vector3(-1, -1, 1), // Vértice 1
-            new Vector3(-1, 1, -1), // Vértice 2
-            new Vector3(1, -1, -1)  // Vértice 3
-        };     // Guarda la coordenada local del vertice
+        Vector3[] vertices = new Vector3[numNodes];
+        int[] triangles = new int[numTetraedros * 12];       // Guarda los indices de los vertices de un triangulo bajo un identificador de triangulo
 
 
-        int[] triangles = new int[]
+        // Parser de los vertices
+        int index = 0;
+        for (int i = 4; i <= (numNodes * 4); i += 4)
         {
-            0, 1, 2,  // Triángulo 1 (Vértices 0, 1, 2)
-            0, 3, 1,  // Triángulo 2 (Vértices 0, 3, 1)
-            0, 2, 3,  // Triángulo 3 (Vértices 0, 2, 3)
-            1, 3, 2   // Triángulo 4 (Vértices 1, 3, 2)
+            index = int.Parse(textString[i]);
+            float vx = float.Parse(textString[i + 1], locale);
+            float vy = float.Parse(textString[i + 2], locale);
+            float vz = float.Parse(textString[i + 3], locale);
+            //print(index);
+            vertices[index - 1].x = vx;
+            vertices[index - 1].y = vy;
+            vertices[index - 1].z = vz;
 
-        };       // Guarda los indices de los vertices de un triangulo bajo un identificador de triangulo
+            //print("vx es " + vx);
+            //print(vertices[index-1].y);
+            //print(vertices[index-1].z);
 
+        }
         tetra.vertices = vertices;      // Vertices a la malla en coordenadas locales
+
+        // Parser de triangulos de cada tetraedro
+        int numTetra = 0;
+        for (int i = 3; i <= (numTetraedros * 5); i += 5)
+        {
+            index = int.Parse(tetraString[i]);
+            int t1 = int.Parse(tetraString[i + 1], locale);
+            int t2 = int.Parse(tetraString[i + 2], locale);
+            int t3 = int.Parse(tetraString[i + 3], locale);
+            int t4 = int.Parse(tetraString[i + 4], locale);
+
+            triangles[numTetra] = t1 - 1;
+            triangles[numTetra + 1] = t2 - 1;
+            triangles[numTetra + 2] = t3 - 1;
+
+            numTetra += 3;
+            triangles[numTetra] = t1 - 1;
+            triangles[numTetra + 1] = t2 - 1;
+            triangles[numTetra + 2] = t4 - 1;
+
+            numTetra += 3;
+            triangles[numTetra] = t1 - 1;
+            triangles[numTetra + 1] = t3 - 1;
+            triangles[numTetra + 2] = t4 - 1;
+
+            numTetra += 3;
+            triangles[numTetra] = t2 - 1;
+            triangles[numTetra + 1] = t3 - 1;
+            triangles[numTetra + 2] = t4 - 1;
+
+
+            print("triangulo " + index);
+            print(t1);
+            print(t2);
+            print(t3);
+            print(t4);
+
+        }
         tetra.triangles = triangles;    // Lista de indices de vertices para que la malla sepa unir los vertices
 
         tetraFilter = gameObject.AddComponent<MeshFilter>();
         tetraFilter.mesh = tetra;
+
+        tetra.RecalculateNormals();     // Calcula las normales basandose en la lista de indices triangles
+        tetra.RecalculateBounds();      // Calcula los limites del objeto
 
         foreach (Vector3 vertex in vertices)
         {
@@ -88,7 +156,7 @@ public class tetraEdroGenerator : MonoBehaviour
         //    nodeList[i]._fixed = true;
         //}
 
-        for (int index = 0; index < triangles.Length - 1; index += 3)
+        for (index = 0; index < triangles.Length - 1; index += 3)
         {
             //Debug.Log(triangles[index] + " " + triangles[index + 1] + " " + triangles[index + 1]);
             int index1 = triangles[index];
@@ -129,6 +197,7 @@ public class tetraEdroGenerator : MonoBehaviour
     {
         if (this.Paused)
             return; // Not simulating
+        print("adios");
         // Select integration method
         this.stepSymplectic();
 
@@ -165,8 +234,12 @@ public class tetraEdroGenerator : MonoBehaviour
         {
             spring.UpdateLength();
         }
-        //print("nodo en la pos " + nodeList[1].pos);
+        print("nodo en la pos " + nodeList[1].pos);
 
+    }
+    private void stepExplicit()
+    {
+        print("explicit");
     }
     void OnDrawGizmos()
     {
@@ -193,3 +266,4 @@ public class tetraEdroGenerator : MonoBehaviour
         }
     }
 }
+// pepe
