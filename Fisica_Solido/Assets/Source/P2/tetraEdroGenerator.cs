@@ -32,6 +32,8 @@ public class tetraEdroGenerator : MonoBehaviour
     };
     #endregion
 
+    public TextAsset submarino;
+
     public void Awake() {
         nodeList = new List<Node>();
         springList = new List<Spring>();
