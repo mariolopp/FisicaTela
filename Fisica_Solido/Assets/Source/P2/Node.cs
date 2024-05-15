@@ -37,7 +37,6 @@ public class Node {
     public void ComputeForces()
     {
         // Aplicar la fuerza de la gravedad sobre el nodo
-        Debug.Log("Gravedad es "+massSprClth.Gravity);
         force += massSprClth.mass * massSprClth.Gravity;
         //Vector3 roz_viento = -(massSprClth.mass*wind_factor) * vel;
         //force += roz_viento;

@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Globalization;
 using System;
+using Unity.VisualScripting;
 
 public class tetraEdroGenerator : MonoBehaviour
 {
@@ -13,8 +14,8 @@ public class tetraEdroGenerator : MonoBehaviour
     public float stiffness = 50f; //asignar a los muelles
     public float mass = 1000.0f;
     public Integration IntegrationMethod;
-    public List<Node> nodeList;        // Lista de nodos
-    public List<Spring> springList; // Lista de muelles
+    public List<Node> nodeList;         // Lista de nodos
+    public List<Spring> springList;     // Lista de muelles
     public float stiffness_traccion;
     public float stiffness_flexion;
     //public List<int[]> aristas;       // Array de arrays de 3 ints
@@ -33,14 +34,22 @@ public class tetraEdroGenerator : MonoBehaviour
 
     #region meshVariables
     public TextAsset fileName;
-    public TextAsset tetraedros;
+    public TextAsset text_tetraedros;
     public Mesh tetra;
     public MeshFilter tetraFilter;
+    public GameObject submarine;
+    Vector3[] sub_vertex;           // Array de vertices de la malla high poly
+    public int[] hPolyList;         // Guarda en que tetraedro esta cada vertice del modelo,
+                                    // siendo en indice el vertice y el contenido el nº de tetraedro
+    public int[][] tetraedros;      // Array de arrays de integers [indexTetraedro][0-3 id vertices]
+    public Vector4[] bar_coords;      // Coordenadas baricentricas de cada vertice high poly
+    Mesh sub;
     #endregion
     public void Awake() {
         nodeList = new List<Node>();
         springList = new List<Spring>();
         //aristas = new List<int[]>();  // Guarda vertices asociados a un triangulo ordenados de menor a mayor
+        
 
         Paused = false;
         TimeStep = 0.01f;
@@ -49,24 +58,23 @@ public class tetraEdroGenerator : MonoBehaviour
         Paused = false;
         // Malla asociada al game Object
         tetra = new Mesh();
-
+        // Malla del objeto high poly
+        sub = submarine.GetComponentInChildren<MeshFilter>().mesh;
 
 
         string[] textString = fileName.text.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-        string[] tetraString = tetraedros.text.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+        string[] tetraString = text_tetraedros.text.Split(new string[] { " ", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
 
         int numNodes = int.Parse(textString[0]);
         int numCoord = int.Parse(textString[1]);
 
         int numTetraedros = int.Parse(tetraString[0]);
-        // NOTA: 
-        // Para parsear números flotantes hay que tener en
-        // cuenta el formato de número en el que está escrito.
-        // Para ello hay que instanciar un objeto de la clase
-        // CultureInfo que almacena información de localización. 
-        // Los números con "." como separador decimal como 1.425
-        // tienen localización de EEUU, "en-US".
 
+        tetraedros = new int[numTetraedros][];
+        hPolyList = new int[sub.vertexCount];
+        bar_coords = new Vector4[sub.vertexCount];
+
+        // Para que distinga el punto
         CultureInfo locale = new CultureInfo("en-US");
         float valor = float.Parse("1.425", locale);
 
@@ -125,13 +133,16 @@ public class tetraEdroGenerator : MonoBehaviour
             triangles[numTetra + 1] = t3 - 1;
             triangles[numTetra + 2] = t4 - 1;
 
+            // Inicializar array de tetraedros formado de indices que contienen un array 
+            // con los ids de los vertices de los que el tetraedro esta formado
+            //print("triangulo " + index);
+            //print(t1);
+            //print(t2);
+            //print(t3);
+            //print(t4);
 
-            print("triangulo " + index);
-            print(t1);
-            print(t2);
-            print(t3);
-            print(t4);
-
+            tetraedros[index-1] = new int[] {t1-1, t2-1, t3-1, t4 - 1 };
+            //if ((t1 < 0) || (t2 < 0) || (t3 < 0) || (t4 < 0)) { print("ERROR"); }
         }
         tetra.triangles = triangles;    // Lista de indices de vertices para que la malla sepa unir los vertices
 
@@ -170,6 +181,66 @@ public class tetraEdroGenerator : MonoBehaviour
         
         tetra.RecalculateNormals();     // Calcula las normales basandose en la lista de indices triangles
         tetra.RecalculateBounds();      // Calcula los limites del objeto
+
+        // Una vez tenemos todos los vertices y aristas establecidos procedemos a comprobar que vertices del obj
+        // pertenecen a cada tetraedro
+
+        // Recorrer la malla de vertices high poly
+        
+
+        sub_vertex = sub.vertices;
+
+        for (int i = 0; i < sub.vertexCount; i++)       // Recorre todos los vertices high poly
+        {
+            // Vertice buscado
+            Vector3 pSearch = sub_vertex[i];
+            for (int j = 0; j < tetraedros.Length-1; j++) {   // Comprueba para cada uno a que tetraedro pertenece
+                // Vertice buscado
+
+                // Vertices del tetraedro
+                Vector3 v0 = vertices[tetraedros[j][0]];
+                Vector3 v1 = vertices[tetraedros[j][1]];
+                Vector3 v2 = vertices[tetraedros[j][2]];
+                Vector3 v3 = vertices[tetraedros[j][3]];
+
+                float volumenTotal = volumenTetra(v0, v1, v2, v3);  // Volumen del tetraedro
+                float vol0 = volumenTetra(v0, v1, v2, pSearch);
+                float vol1 = volumenTetra(v0, v1, v3, pSearch);
+                float vol2 = volumenTetra(v0, v2, v3, pSearch);
+                float vol3 = volumenTetra(v1, v2, v3, pSearch);
+
+                float peso0 = volumenTotal / vol0;
+                float peso1 = volumenTotal / vol1;
+                float peso2 = volumenTotal / vol2;
+                float peso3 = volumenTotal / vol3;
+
+
+                if ((peso0 >= 0) && (peso0 <= 1) && 
+                    (peso1 >= 0) && (peso1 <= 1) && 
+                    (peso2 >= 0) && (peso2 <= 1) && 
+                    (peso3 >= 0) && (peso3 <= 1))   // Si no hay volumenes negativos
+                {
+                    // El punto esta dentro de dicho tetraedro
+                    hPolyList[i] = j; // Guarda el indice de tetraedro que contiene al vertice
+                    bar_coords[i] = new Vector4(peso0, peso1, peso2, peso3);
+                    print(bar_coords[i]);
+                    break;
+                }
+
+                
+            }
+
+        }
+
+
+        //for (int i = 0; i < sub_vertex.Length; i++) {
+        //    sub_vertex[i] += new Vector3(5000.0f, 5000.0f, 5000.0f);
+        //}
+        sub.vertices = sub_vertex;
+        
+
+
+
     }
     // Update is called once per frame
     public void Update()
@@ -191,13 +262,47 @@ public class tetraEdroGenerator : MonoBehaviour
         tetra.vertices = vertices;
 
         //print("El vertice de la malla se ha movido a " + mesh.vertices[1]);
+
+        for (int i = 0; i < sub_vertex.Length; i++) {       // Recorrer todos los vertices malla high poly
+            // Para cada vertice del high poly, aplico la modificación que haya sufrido su tetraedro
+            int tIndex = hPolyList[i];          // indice de tetraedro asociado al vertice
+            Vector4 bc = bar_coords[i];         // Coordenadas baricentricas del vertice
+
+            // Ids de los vertices del tetraedro
+            int id0 = tetraedros[tIndex][0];
+            int id1 = tetraedros[tIndex][1];
+            int id2 = tetraedros[tIndex][2];
+            int id3 = tetraedros[tIndex][3];
+
+            // Coordenadas de los vertices del tetraedro
+            Vector3 v0 = vertices[id0];
+            Vector3 v1 = vertices[id1];
+            Vector3 v2 = vertices[id2];
+            Vector3 v3 = vertices[id3];
+
+            //print(bc.x);
+            //print(bc.y);
+            //print(bc.z);
+            //print(bc.w);
+
+            Vector3 newCoord = bc.x * v0 + bc.y * v1 + bc.z * v2 + bc.w * v3;
+            //print(newCoord);
+            sub_vertex[i] = newCoord;   // Vertices que nos interesa cambiar
+            
+        }
+        sub.vertices = sub_vertex;
+        
     }
+    private float volumenTetra(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4) {
+        return Vector3.Dot(Vector3.Cross((p2 - p1), (p3 - p1)), (p4-p1));
+    }
+
+    
 
     public void FixedUpdate()
     {
         if (this.Paused)
             return; // Not simulating
-        print("adios");
         // Select integration method
         this.stepSymplectic();
 
@@ -234,7 +339,7 @@ public class tetraEdroGenerator : MonoBehaviour
         {
             spring.UpdateLength();
         }
-        print("nodo en la pos " + nodeList[1].pos);
+        //print("nodo en la pos " + nodeList[1].pos);
 
     }
     private void stepExplicit()
