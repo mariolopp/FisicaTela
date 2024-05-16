@@ -22,7 +22,7 @@ public class Colisionable : MonoBehaviour
     void Start()
     {
 
-        cloths = GameObject.FindGameObjectsWithTag("Cloth");
+        cloths = GameObject.FindGameObjectsWithTag("edro");
         if (cloths != null)
         {
             cloth = cloths[0].GetComponent<tetraEdroGenerator>();

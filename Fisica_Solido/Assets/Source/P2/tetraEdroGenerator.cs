@@ -12,7 +12,7 @@ public class tetraEdroGenerator : MonoBehaviour
     public float TimeStep;
     public Vector3 Gravity;
     public float stiffness = 50f; //asignar a los muelles
-    public float mass = 1000.0f;
+    public float mass = 5.0f;
     public Integration IntegrationMethod;
     public List<Node> nodeList;         // Lista de nodos
     public List<Spring> springList;     // Lista de muelles
@@ -412,4 +412,3 @@ public class tetraEdroGenerator : MonoBehaviour
         }
     }
 }
-// pepe
